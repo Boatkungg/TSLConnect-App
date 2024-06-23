@@ -1,15 +1,25 @@
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
+import "package:camera/camera.dart";
+import "package:myapp/sign2thai.dart";
 import "navigation.dart";
 
+// camera
+late List<CameraDescription> cameras;
+
+// navigator
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "root");
 final _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "shell");
-
 
 // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart#L170
 // https://stackoverflow.com/questions/71011598/how-to-work-with-navigationbar-in-go-router-flutter
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // camera
+  cameras = await availableCameras();
+
   runApp(MyApp());
 }
 
@@ -31,7 +41,7 @@ class MyApp extends StatelessWidget {
               GoRoute(
                 path: "/sign2thai",
                 builder: (BuildContext context, GoRouterState state) {
-                  return const Aaa();
+                  return Sign2Thai(cameras: cameras);
                 },
               ),
               GoRoute(
@@ -58,7 +68,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.red,
       ),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       routerConfig: _router,
     );
   }
