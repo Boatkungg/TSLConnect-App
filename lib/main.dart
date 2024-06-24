@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.red,
       ),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       routerConfig: _router,
     );
   }
