@@ -5,7 +5,7 @@ import "package:myapp/sign2thai.dart";
 import "navigation.dart";
 
 // camera
-late List<CameraDescription> cameras;
+// late List<CameraDescription> cameras;
 
 // navigator
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "root");
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
               GoRoute(
                 path: "/sign2thai",
                 builder: (BuildContext context, GoRouterState state) {
-                  return Sign2Thai(cameras: cameras);
+                  return Sign2Thai();
                 },
               ),
               GoRoute(

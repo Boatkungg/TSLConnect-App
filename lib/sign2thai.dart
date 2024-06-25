@@ -1,39 +1,55 @@
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
-import "package:flutter/widgets.dart";
-import "package:myapp/main.dart";
 //import "package:http/http.dart" as http;
 
-class Sign2Thai extends StatefulWidget {
-  const Sign2Thai({required this.cameras, super.key});
+late List<CameraDescription> cameras;
 
-  final List<CameraDescription> cameras;
+class Sign2Thai extends StatefulWidget {
+  const Sign2Thai({
+    // required this.cameras, 
+    super.key
+    });
+
+  // final List<CameraDescription> cameras;
 
   @override
   State<Sign2Thai> createState() => _Sign2ThaiState();
 }
 
 class _Sign2ThaiState extends State<Sign2Thai> {
+  int cameraIndex = 0;
+  int cameraCount = 0;
   late CameraController camController;
 
-  void initCamera() async {
+  void initCamera(CameraDescription camera) async {
     camController =
-        CameraController(widget.cameras.first, ResolutionPreset.max);
-    await camController.initialize().catchError((e) {
+        CameraController(camera, ResolutionPreset.max, enableAudio: false);
+    await camController.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    }).catchError((e) {
       print('Error initializing camera: $e');
       camController.dispose();
-      initCamera();
+      initCamera(camera);
     });
-    if (!mounted) {
-      return;
+  }
+
+  void switchCamera() {
+    if (cameraIndex < cameraCount - 1) {
+      cameraIndex++;
+    } else {
+      cameraIndex = 0;
     }
-    setState(() {});
+    camController.setDescription(cameras[cameraIndex]);
   }
 
   @override
   void initState() {
     super.initState();
-    initCamera();
+    cameraCount = cameras.length;
+    initCamera(cameras[cameraIndex]);
   }
 
   @override
@@ -44,6 +60,8 @@ class _Sign2ThaiState extends State<Sign2Thai> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -62,11 +80,25 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-
-                    // TODO: change icon
                     children: [
                       // change camera
-                      const Icon(Icons.cameraswitch, size: 30),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color.fromARGB(176, 255, 255, 255),
+                        ),
+                        child: IconButton(
+                          onPressed: switchCamera,
+                          padding: const EdgeInsets.all(0),
+                          icon: const Icon(
+                            Icons.cameraswitch,
+                            color: Colors.black,
+                            size: 35,
+                          ),
+                        ),
+                      ),
 
                       // record
                       RawMaterialButton(
@@ -74,29 +106,37 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                         shape: const CircleBorder(),
                         fillColor: Colors.white,
                         constraints: const BoxConstraints.tightFor(
-                          width: 60,
-                          height: 60,
+                          width: 70,
+                          height: 70,
                         ),
                         child: Container(
-                          width: 55,
-                          height: 55,
+                          width: 60,
+                          height: 60,
                           decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red,
-                              // border: Border(
-                              //   top: BorderSide(width: 2, color: Colors.white),
-                              //   right:
-                              //       BorderSide(width: 2, color: Colors.white),
-                              //   bottom:
-                              //       BorderSide(width: 2, color: Colors.white),
-                              //   left: BorderSide(width: 2, color: Colors.white),
-                              // )
-                            ),
+                            shape: BoxShape.circle,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
 
                       // select video
-                      const Icon(Icons.sign_language, size: 30)
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color.fromARGB(176, 255, 255, 255),
+                        ),
+                        child: const IconButton(
+                          onPressed: null,
+                          padding: EdgeInsets.all(0),
+                          icon: Icon(
+                            Icons.add_photo_alternate,
+                            color: Colors.black,
+                            size: 35,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
