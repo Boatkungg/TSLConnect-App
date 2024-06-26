@@ -5,10 +5,10 @@ import "package:camera/camera.dart";
 late List<CameraDescription> cameras;
 
 class Sign2Thai extends StatefulWidget {
-  const Sign2Thai({
-    // required this.cameras, 
-    super.key
-    });
+  const Sign2Thai(
+      {
+      // required this.cameras,
+      super.key});
 
   // final List<CameraDescription> cameras;
 
@@ -17,9 +17,12 @@ class Sign2Thai extends StatefulWidget {
 }
 
 class _Sign2ThaiState extends State<Sign2Thai> {
+  late CameraController camController;
+  // late Future<void> camFuture;
+  late String filePath;
   int cameraIndex = 0;
   int cameraCount = 0;
-  late CameraController camController;
+  bool isRecording = false;
 
   void initCamera(CameraDescription camera) async {
     camController =
@@ -31,10 +34,16 @@ class _Sign2ThaiState extends State<Sign2Thai> {
       setState(() {});
     }).catchError((e) {
       print('Error initializing camera: $e');
-      camController.dispose();
-      initCamera(camera);
+      // camController.dispose();
+      // initCamera(camera);
     });
   }
+
+  // void initCamera(CameraDescription camera) async {
+  //   camController =
+  //       CameraController(camera, ResolutionPreset.max, enableAudio: false);
+  //   camFuture = camController.initialize();
+  // }
 
   void switchCamera() {
     if (cameraIndex < cameraCount - 1) {
@@ -45,10 +54,28 @@ class _Sign2ThaiState extends State<Sign2Thai> {
     camController.setDescription(cameras[cameraIndex]);
   }
 
+  void recordVideo() async {
+    if (!isRecording) {
+      await camController.prepareForVideoRecording();
+      await camController.startVideoRecording();
+      setState(() {
+        isRecording = true;
+      });
+    } else {
+      final file = await camController.stopVideoRecording();
+      filePath = file.path;
+      print(filePath);
+      setState(() {
+        isRecording = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     cameraCount = cameras.length;
+    print(cameraCount);
     initCamera(cameras[cameraIndex]);
   }
 
@@ -71,6 +98,20 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                   height: MediaQuery.of(context).size.height,
                   child: CameraPreview(camController))
               : const Center(child: CircularProgressIndicator()),
+          // FutureBuilder(
+          //   future: camFuture,
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.done) {
+          //       return SizedBox(
+          //         width: MediaQuery.of(context).size.width,
+          //         height: MediaQuery.of(context).size.height,
+          //         child: CameraPreview(camController),
+          //       );
+          //     }else {
+          //       return const Center(child: CircularProgressIndicator());
+          //     }
+          //   },
+          // ),
           Positioned(
             bottom: 0,
             child: Container(
@@ -102,22 +143,26 @@ class _Sign2ThaiState extends State<Sign2Thai> {
 
                       // record
                       RawMaterialButton(
-                        onPressed: null,
-                        shape: const CircleBorder(),
-                        fillColor: Colors.white,
-                        constraints: const BoxConstraints.tightFor(
-                          width: 70,
-                          height: 70,
-                        ),
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red,
+                          onPressed: recordVideo,
+                          shape: const CircleBorder(),
+                          fillColor: Colors.white,
+                          padding: const EdgeInsets.all(5),
+                          constraints: const BoxConstraints.tightFor(
+                            width: 70,
+                            height: 70,
                           ),
-                        ),
-                      ),
+                          child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 100),
+                              alignment: Alignment.center,
+                              width: !isRecording ? 60 : 30,
+                              height: !isRecording ? 60 : 30,
+                              decoration: BoxDecoration(
+                                // circle box hack
+                                borderRadius: !isRecording
+                                    ? BorderRadius.circular(30)
+                                    : BorderRadius.circular(5),
+                                color: Colors.red,
+                              ))),
 
                       // select video
                       Container(
