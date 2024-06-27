@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:camera/camera.dart";
 import "package:myapp/sign2thai.dart";
-import "navigation.dart";
+import "package:myapp/navigation.dart";
 
 // camera
 // late List<CameraDescription> cameras;

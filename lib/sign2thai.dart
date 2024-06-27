@@ -1,5 +1,7 @@
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
+import "package:myapp/uploader.dart";
+
 //import "package:http/http.dart" as http;
 
 late List<CameraDescription> cameras;
@@ -64,11 +66,49 @@ class _Sign2ThaiState extends State<Sign2Thai> {
     } else {
       final file = await camController.stopVideoRecording();
       filePath = file.path;
+
       print(filePath);
       setState(() {
         isRecording = false;
       });
     }
+  }
+
+  Future<String> getTranslation(String videoPath) async {
+    final translation = await uploadVideo(videoPath);
+    print(translation);
+    return translation;
+  }
+
+  void displayTranslation(String translation) {
+    showModalBottomSheet(
+      context: context, 
+      builder: (context) {
+        return Container(
+          height: 300,
+          width: double.infinity,
+          padding: const EdgeInsets.all(40),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Text("Translation", style: TextStyle(fontSize: 20))
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Text(translation, style: const TextStyle(fontSize: 20))
+              )
+            ],
+          )
+        );
+      }
+    );
   }
 
   @override
@@ -131,7 +171,7 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                           color: Color.fromARGB(176, 255, 255, 255),
                         ),
                         child: IconButton(
-                          onPressed: switchCamera,
+                          onPressed: () => displayTranslation("asdasdsad"),
                           padding: const EdgeInsets.all(0),
                           icon: const Icon(
                             Icons.cameraswitch,
