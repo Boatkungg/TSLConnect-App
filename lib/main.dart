@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:camera/camera.dart";
 import "package:myapp/sign2thai.dart";
+import "package:myapp/thai2sign.dart";
 import "package:myapp/navigation.dart";
 
 // camera
@@ -36,7 +37,8 @@ class MyApp extends StatelessWidget {
     initialLocation: "/sign2thai",
     routes: [
       StatefulShellRoute.indexedStack(
-        builder: (BuildContext context, GoRouterState state,  StatefulNavigationShell navigationShell) {
+        builder: (BuildContext context, GoRouterState state,
+            StatefulNavigationShell navigationShell) {
           return Navigation(navigationShell: navigationShell);
         },
         branches: [
@@ -46,13 +48,13 @@ class MyApp extends StatelessWidget {
               GoRoute(
                 path: "/sign2thai",
                 builder: (BuildContext context, GoRouterState state) {
-                  return Sign2Thai();
+                  return const Sign2Thai();
                 },
               ),
               GoRoute(
                 path: "/thai2sign",
                 builder: (BuildContext context, GoRouterState state) {
-                  return const Bbb();
+                  return const Thai2Sign();
                 },
               ),
             ],

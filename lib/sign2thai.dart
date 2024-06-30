@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
+import "package:image_picker/image_picker.dart";
 import "package:myapp/uploader.dart";
 
 //import "package:http/http.dart" as http;
@@ -20,11 +21,13 @@ class Sign2Thai extends StatefulWidget {
 
 class _Sign2ThaiState extends State<Sign2Thai> {
   late CameraController camController;
+  final ImagePicker picker = ImagePicker();
   // late Future<void> camFuture;
   late String filePath;
   int cameraIndex = 0;
   int cameraCount = 0;
   bool isRecording = false;
+  bool isProcessing = false;
 
   void initCamera(CameraDescription camera) async {
     camController =
@@ -57,6 +60,9 @@ class _Sign2ThaiState extends State<Sign2Thai> {
   }
 
   void recordVideo() async {
+    if (isProcessing) {
+      return;
+    }
     if (!isRecording) {
       await camController.prepareForVideoRecording();
       await camController.startVideoRecording();
@@ -66,7 +72,8 @@ class _Sign2ThaiState extends State<Sign2Thai> {
     } else {
       final file = await camController.stopVideoRecording();
       filePath = file.path;
-
+      final translation = await getTranslation(filePath);
+      displayTranslation(translation);
       print(filePath);
       setState(() {
         isRecording = false;
@@ -74,41 +81,56 @@ class _Sign2ThaiState extends State<Sign2Thai> {
     }
   }
 
+  void selectVideo() async {
+    final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      filePath = pickedFile.path;
+      final translation = await getTranslation(filePath);
+      displayTranslation(translation);
+    }
+  }
+
   Future<String> getTranslation(String videoPath) async {
-    final translation = await uploadVideo(videoPath);
+    setState(() {
+      isProcessing = true;
+    });
+    const translation = "asasdasdasd";
+    // sleep
+    await Future.delayed(const Duration(seconds: 2));
+    //final translation = await uploadVideo(videoPath);
+    setState(() {
+      isProcessing = false;
+    });
     print(translation);
     return translation;
   }
 
   void displayTranslation(String translation) {
     showModalBottomSheet(
-      context: context, 
-      builder: (context) {
-        return Container(
-          height: 300,
-          width: double.infinity,
-          padding: const EdgeInsets.all(40),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              const Align(
-                alignment: Alignment.topLeft,
-                child: Text("Translation", style: TextStyle(fontSize: 20))
+        context: context,
+        builder: (context) {
+          return Container(
+              height: 300,
+              width: double.infinity,
+              padding: const EdgeInsets.all(40),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(translation, style: const TextStyle(fontSize: 20))
-              )
-            ],
-          )
-        );
-      }
-    );
+              child: Column(
+                children: [
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: SelectableText(
+                        translation,
+                        style: const TextStyle(fontSize: 20),
+                        maxLines: 6,
+                      ))
+                ],
+              ));
+        });
   }
 
   @override
@@ -171,7 +193,7 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                           color: Color.fromARGB(176, 255, 255, 255),
                         ),
                         child: IconButton(
-                          onPressed: () => displayTranslation("asdasdsad"),
+                          onPressed: switchCamera,
                           padding: const EdgeInsets.all(0),
                           icon: const Icon(
                             Icons.cameraswitch,
@@ -187,22 +209,27 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                           shape: const CircleBorder(),
                           fillColor: Colors.white,
                           padding: const EdgeInsets.all(5),
+                          enableFeedback: false,
                           constraints: const BoxConstraints.tightFor(
                             width: 70,
                             height: 70,
                           ),
-                          child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 100),
-                              alignment: Alignment.center,
-                              width: !isRecording ? 60 : 30,
-                              height: !isRecording ? 60 : 30,
-                              decoration: BoxDecoration(
-                                // circle box hack
-                                borderRadius: !isRecording
-                                    ? BorderRadius.circular(30)
-                                    : BorderRadius.circular(5),
-                                color: Colors.red,
-                              ))),
+                          child: !isProcessing
+                              ? AnimatedContainer(
+                                  duration: const Duration(milliseconds: 100),
+                                  alignment: Alignment.center,
+                                  width: !isRecording ? 60 : 30,
+                                  height: !isRecording ? 60 : 30,
+                                  decoration: BoxDecoration(
+                                    // circle box hack
+                                    borderRadius: !isRecording
+                                        ? BorderRadius.circular(30)
+                                        : BorderRadius.circular(5),
+                                    color: Colors.red,
+                                  ))
+                              : const Center(
+                                  child: CircularProgressIndicator(
+                                      color: Colors.red))),
 
                       // select video
                       Container(
@@ -212,10 +239,10 @@ class _Sign2ThaiState extends State<Sign2Thai> {
                           shape: BoxShape.circle,
                           color: Color.fromARGB(176, 255, 255, 255),
                         ),
-                        child: const IconButton(
-                          onPressed: null,
-                          padding: EdgeInsets.all(0),
-                          icon: Icon(
+                        child: IconButton(
+                          onPressed: selectVideo,
+                          padding: const EdgeInsets.all(0),
+                          icon: const Icon(
                             Icons.add_photo_alternate,
                             color: Colors.black,
                             size: 35,
