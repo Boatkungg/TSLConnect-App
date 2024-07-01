@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import "package:image_picker/image_picker.dart";
-import "package:myapp/uploader.dart";
+import "package:myapp/functions/uploader.dart";
 
 //import "package:http/http.dart" as http;
 

@@ -1,6 +1,4 @@
-import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 
 class Thai2Sign extends StatefulWidget {
   const Thai2Sign({super.key});
@@ -67,13 +65,13 @@ class _Thai2SignState extends State<Thai2Sign> {
                           child: IconButton(
                               onPressed: null,
                               icon: Icon(
-                                Icons.arrow_right,
+                                Icons.arrow_forward,
                                 color: theme.colorScheme.onPrimary,
                               )),
                         ),
                       ],
                     )
-                  : SizedBox()
+                  : const SizedBox()
             ])));
   }
 }
