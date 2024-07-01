@@ -19,7 +19,7 @@ class _DisplaySignState extends State<DisplaySign> {
   @override
   void initState() {
     super.initState();
-    videoController = VideoPlayerController.networkUrl(Uri.parse(widget.videoLink));
+    videoController = VideoPlayerController.networkUrl(Uri.parse("https://github.com/Boatkungg/TSLConnect-App/raw/main/lib/assets/placeholder.mp4"));
 
     videoController.addListener(() {
       setState(() {});
@@ -42,7 +42,20 @@ class _DisplaySignState extends State<DisplaySign> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: VideoPlayer(videoController),
+      body: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 30, left: 20),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
+            ),
+          ),
+          VideoPlayer(videoController)
+        ],
+      ),
     );
   }
 }

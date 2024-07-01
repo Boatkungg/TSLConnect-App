@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:camera/camera.dart";
+import "package:myapp/display_sign.dart";
 import "package:myapp/sign2thai.dart";
 import "package:myapp/thai2sign.dart";
 import "package:myapp/navigation.dart";
@@ -47,15 +48,24 @@ class MyApp extends StatelessWidget {
             routes: [
               GoRoute(
                 path: "/sign2thai",
-                builder: (BuildContext context, GoRouterState state) {
+                builder: (context, state) {
                   return const Sign2Thai();
                 },
               ),
               GoRoute(
                 path: "/thai2sign",
-                builder: (BuildContext context, GoRouterState state) {
+                builder: (context, state) {
                   return const Thai2Sign();
                 },
+                routes: [
+                  GoRoute(
+                    path: "result/:video_id",
+                    builder: (context, state) {
+                      final videoId = state.pathParameters["video_id"]!;
+                      return DisplaySign(videoLink: videoId);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

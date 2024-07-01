@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 
 class Thai2Sign extends StatefulWidget {
   const Thai2Sign({super.key});
@@ -10,6 +11,29 @@ class Thai2Sign extends StatefulWidget {
 class _Thai2SignState extends State<Thai2Sign> {
   final TextEditingController textController = TextEditingController();
   bool haveText = false;
+  bool isProcessing = false;
+
+  void translate() async {
+    final translation = await getTranslation(textController.text);
+    if (mounted) {
+      context.go("/thai2sign/result/$translation");
+    }
+  }
+
+  Future<String> getTranslation(String text) async {
+    setState(() {
+      isProcessing = true;
+    });
+    const translation = "asasdasdasd";
+    // sleep
+    await Future.delayed(const Duration(seconds: 2));
+    //final translation = await uploadVideo(videoPath);
+    setState(() {
+      isProcessing = false;
+    });
+    print(translation);
+    return translation;
+  }
 
   @override
   void dispose() {
@@ -29,7 +53,8 @@ class _Thai2SignState extends State<Thai2Sign> {
               right: 20,
             ),
             child: Column(children: [
-              SingleChildScrollView(child: TextField(
+              SingleChildScrollView(
+                  child: TextField(
                 controller: textController,
                 onChanged: (value) {
                   setState(() {
@@ -62,12 +87,14 @@ class _Thai2SignState extends State<Thai2Sign> {
                           decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: theme.colorScheme.primary),
-                          child: IconButton(
-                              onPressed: null,
-                              icon: Icon(
-                                Icons.arrow_forward,
-                                color: theme.colorScheme.onPrimary,
-                              )),
+                          child: !isProcessing
+                              ? IconButton(
+                                  onPressed: translate,
+                                  icon: Icon(
+                                    Icons.arrow_forward,
+                                    color: theme.colorScheme.onPrimary,
+                                  ))
+                              : const CircularProgressIndicator(),
                         ),
                       ],
                     )
