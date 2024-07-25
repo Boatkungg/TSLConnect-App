@@ -1,9 +1,10 @@
 import "dart:convert" as convert;
+import "dart:typed_data";
 import "package:http/http.dart" as http;
 
-String url = "https://192.168.1.100:8000/";
+String url = "https://api.mystrokeapi.uk";
 
-Future<String> uploadVideo(String filePath) async {
+Future<String> uploadVideo(Uint8List bytes) async {
   Map<String, String> headers = {
     "Content-Type": "multipart/form-data",
   };
@@ -12,7 +13,7 @@ Future<String> uploadVideo(String filePath) async {
 
   request.headers.addAll(headers);
 
-  request.files.add(await http.MultipartFile.fromPath('video', filePath));
+  request.files.add(http.MultipartFile.fromBytes("file", bytes, filename: "video.mp4"));
 
   var response = await request.send();
 
@@ -20,9 +21,9 @@ Future<String> uploadVideo(String filePath) async {
     var jsonResponse =
         convert.jsonDecode((await http.Response.fromStream(response)).body)
             as Map<String, dynamic>;
-    return jsonResponse["translation"];
+    return convert.utf8.decode(jsonResponse["translation"].toString().codeUnits);
   } else {
-    throw Exception('Failed to upload video');
+    return "";
   }
 }
 
@@ -30,7 +31,7 @@ Future<String> uploadText(String text) async {
   var response = await http.post(
     Uri.parse("$url/thai2sign"),
     headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
+      'Content-Type': 'application/json',
     },
     body: convert.jsonEncode(<String, String>{
       'text': text,
@@ -42,6 +43,6 @@ Future<String> uploadText(String text) async {
         convert.jsonDecode(response.body) as Map<String, dynamic>;
     return jsonResponse["link"];
   } else {
-    throw Exception('Failed to upload text');
+    return "";
   }
 }

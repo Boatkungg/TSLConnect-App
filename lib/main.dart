@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
   final _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: "/sign2thai",
+    
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
@@ -59,9 +60,9 @@ class MyApp extends StatelessWidget {
                 },
                 routes: [
                   GoRoute(
-                    path: "result/:video_id",
+                    path: "result",
                     builder: (context, state) {
-                      final videoId = state.pathParameters["video_id"]!;
+                      final videoId = state.uri.queryParameters["videoLink"]!;
                       return DisplaySign(videoLink: videoId);
                     },
                   ),

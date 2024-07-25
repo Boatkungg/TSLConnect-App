@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
+import "package:myapp/functions/uploader.dart";
 
 class Thai2Sign extends StatefulWidget {
   const Thai2Sign({super.key});
@@ -16,7 +17,7 @@ class _Thai2SignState extends State<Thai2Sign> {
   void translate() async {
     final translation = await getTranslation(textController.text);
     if (mounted) {
-      context.go("/thai2sign/result/$translation");
+      context.go("/thai2sign/result?videoLink=$translation");
     }
   }
 
@@ -24,15 +25,16 @@ class _Thai2SignState extends State<Thai2Sign> {
     setState(() {
       isProcessing = true;
     });
-    const translation = "asasdasdasd";
-    // sleep
-    await Future.delayed(const Duration(seconds: 2));
-    //final translation = await uploadVideo(videoPath);
+    var translation = await uploadText(text);
+    translation = translation.split("/").last;
     setState(() {
       isProcessing = false;
     });
-    print(translation);
-    return translation;
+    if (translation != "") {
+      return translation;
+    } else {
+      throw Exception("Translation failed");
+    }
   }
 
   @override

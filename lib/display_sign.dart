@@ -1,11 +1,9 @@
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 import "package:video_player/video_player.dart";
 
 class DisplaySign extends StatefulWidget {
-  const DisplaySign({
-    required this.videoLink,
-    super.key
-  });
+  const DisplaySign({required this.videoLink, super.key});
 
   final String videoLink;
 
@@ -19,13 +17,13 @@ class _DisplaySignState extends State<DisplaySign> {
   @override
   void initState() {
     super.initState();
-    videoController = VideoPlayerController.networkUrl(Uri.parse("https://github.com/Boatkungg/TSLConnect-App/raw/main/lib/assets/placeholder.mp4"));
+    videoController = VideoPlayerController.networkUrl(
+        Uri.parse("https://api.mystrokeapi.uk/video/${widget.videoLink}"))
+      ..initialize().then((_) {
+        setState(() {});
+      });
 
     videoController.addListener(() {
-      setState(() {});
-    });
-
-    videoController.initialize().then((_) {
       setState(() {});
     });
 
@@ -44,16 +42,16 @@ class _DisplaySignState extends State<DisplaySign> {
     return Scaffold(
       body: Stack(
         children: [
+          VideoPlayer(videoController),
           Container(
             margin: const EdgeInsets.only(top: 30, left: 20),
             child: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
               icon: const Icon(Icons.arrow_back),
             ),
           ),
-          VideoPlayer(videoController)
         ],
       ),
     );

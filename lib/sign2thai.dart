@@ -1,3 +1,5 @@
+import "dart:typed_data";
+
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import "package:image_picker/image_picker.dart";
@@ -39,8 +41,8 @@ class _Sign2ThaiState extends State<Sign2Thai> {
       setState(() {});
     }).catchError((e) {
       print('Error initializing camera: $e');
-      // camController.dispose();
-      // initCamera(camera);
+      camController.dispose();
+      initCamera(camera);
     });
   }
 
@@ -71,38 +73,39 @@ class _Sign2ThaiState extends State<Sign2Thai> {
       });
     } else {
       final file = await camController.stopVideoRecording();
-      filePath = file.path;
-      final translation = await getTranslation(filePath);
-      displayTranslation(translation);
-      print(filePath);
       setState(() {
         isRecording = false;
       });
+      final translation = await getTranslation(await file.readAsBytes());
+      displayTranslation(translation);
     }
   }
 
   void selectVideo() async {
     final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
     if (pickedFile != null) {
-      filePath = pickedFile.path;
-      final translation = await getTranslation(filePath);
+      final translation = await getTranslation(await pickedFile.readAsBytes());
       displayTranslation(translation);
     }
   }
 
-  Future<String> getTranslation(String videoPath) async {
+  Future<String> getTranslation(Uint8List bytes) async {
     setState(() {
       isProcessing = true;
     });
-    const translation = "asasdasdasd";
+    //const translation = "ข้อความ";
     // sleep
-    await Future.delayed(const Duration(seconds: 2));
-    //final translation = await uploadVideo(videoPath);
+    //await Future.delayed(const Duration(seconds: 2));
+    final translation = await uploadVideo(bytes);
     setState(() {
       isProcessing = false;
     });
     print(translation);
-    return translation;
+    if (translation != "") {
+      return translation;
+    } else {
+      throw Exception("Translation failed");
+    }
   }
 
   void displayTranslation(String translation) {
